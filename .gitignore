@@ -1,2 +1,9 @@
+
 .DS_Store
 .idea
+*.pyproj
+*.sln
+/tests/.vs/tests/v14
+/tests/__pycache__
+/tests/geckodriver.log
+/tests/.vs/config/applicationhost.config
