@@ -31,17 +31,14 @@ class MeetupTest(BaseCase):
         WebDriverWait(driver, 25).until(EC.presence_of_element_located((By.ID,'linkOfMeetUpHeading')))
         submit = wait.until(EC.element_to_be_clickable((By.ID,'linkOfMeetUpHeading')))
         ele = driver.find_element_by_css_selector('a[href="#meetup/add"]')
-        print(submit.text)
-        submit.send_keys(Keys.NULL)
-        submit.send_keys(Keys.ENTER)
-        submit.click()
-        submit.click()
-        submit.click()
-        submit.click()
-        submit.click()
-        submit.click()
-        ##submit.click()
-       
+
+        keepclicking = True
+        while (keepclicking):
+            try:
+                submit.click()
+                sleep(1)
+            except:
+                keepclicking = False
 
         WebDriverWait(driver, 25).until(EC.presence_of_element_located((By.ID,'meetUpForm')))
         elem = driver.find_element_by_name("title")
