@@ -68,7 +68,7 @@ class MeetupTest(BaseCase):
                 select.select_by_index(1)
                 keeptrying = False
             except:
-                keeptrying = true
+                keeptrying = True
 
         elem = driver.find_element_by_name("meetupLocation")
         elem.send_keys("Test catagory")
