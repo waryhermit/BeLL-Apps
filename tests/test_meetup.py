@@ -62,13 +62,7 @@ class MeetupTest(BaseCase):
         wait.until(EC.element_to_be_clickable((By.NAME,'category')))
         sleep(5)
         select = Select(elem)
-        keeptrying = True
-        while (keeptrying):
-            try:
-                select.select_by_index(1)
-                keeptrying = False
-            except:
-                keeptrying = True
+        select.select_by_value('E Learning')
 
         elem = driver.find_element_by_name("meetupLocation")
         elem.send_keys("Test catagory")
