@@ -15,6 +15,7 @@ from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.keys import Keys
 from time import sleep
 @on_platforms(browsers)
 class MeetupTest(BaseCase):
@@ -31,7 +32,8 @@ class MeetupTest(BaseCase):
         WebDriverWait(driver, 25).until(EC.presence_of_element_located((By.ID,'linkOfMeetUpHeading')))
         submit = wait.until(EC.element_to_be_clickable((By.ID,'linkOfMeetUpHeading')))
         ele = driver.find_element_by_css_selector('a[href="#meetup/add"]')
-        ele.click()
+        ele.send_keys(Keys.NULL)
+        ele.send_keys(Keys.ENTER)
         ##submit.click()
        
         print(submit.text)
