@@ -29,7 +29,7 @@ else:
     ACCESS_KEY = ""
     browsers = [{"platform": "Windows 10",
                  "browserName": "firefox",
-                 "version": "48"}]
+                 "version": "50"}]
 
 def on_platforms(platforms):
     def decorator(base_class):
