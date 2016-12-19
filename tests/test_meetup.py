@@ -59,11 +59,10 @@ class MeetupTest(BaseCase):
         elem.send_keys("11:00pm")
 
         elem = driver.find_element_by_name("category")
+        wait.until(EC.element_to_be_clickable((By.NAME,'category')))
+        sleep(5)
         select = Select(elem)
-        while (len(select.options) < 1):
-            select = Select(elem)
-            sleep(10)
-        
+        sleep(10)
         select.select_by_index(1)
 
         elem = driver.find_element_by_name("meetupLocation")
