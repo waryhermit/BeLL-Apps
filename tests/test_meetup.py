@@ -24,7 +24,10 @@ class MeetupTest(BaseCase):
     def create_Member(self,driver):
         wait = WebDriverWait(driver, 10)
         bell.login(driver,"admin","password")
-        driver.get("http://127.0.0.1:5981/apps/_design/bell/MyApp/index.html#meetups")
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID,'itemsinnavbar')))
+        ele = driver.find_element_by_css_selector('a[href="#meetups"]')
+        ele.click()
+        ##driver.get("http://127.0.0.1:5981/apps/_design/bell/MyApp/index.html#meetups")
 
         submit = wait.until(EC.element_to_be_clickable((By.ID,'linkOfMeetUpHeading')))
         submit.click()
@@ -76,8 +79,8 @@ class MeetupTest(BaseCase):
         driver = self.driver
         wait = WebDriverWait(driver, 10)
         bell.login(driver,"admin","password")
-        driver.get("http://127.0.0.1:5981/apps/_design/bell/MyApp/index.html#meetups")
-
+        ele = driver.find_element_by_css_selector('a[href="#meetups"]')
+        ele.click()
         submit = wait.until(EC.element_to_be_clickable((By.ID,'linkOfMeetUpHeading')))
         try:
             submit = driver.find_element_by_xpath("//*[@id='parentLibrary']/table/tbody/tr[2]/td[4]/a")
