@@ -22,6 +22,7 @@ class MeetupTest(BaseCase):
     # http://www.seleniumhq.org/docs/06_test_design_considerations.jsp#page-object-design-pattern
    
     def create_Member(self,driver):
+        wait = WebDriverWait(driver, 25)
         bell.login(driver,"admin","password")
         WebDriverWait(driver, 25).until(EC.presence_of_element_located((By.ID,'itemsinnavbar')))
         ele = driver.find_element_by_css_selector('a[href="#meetups"]')
@@ -78,6 +79,7 @@ class MeetupTest(BaseCase):
         driver = self.driver
         wait = WebDriverWait(driver, 25)
         bell.login(driver,"admin","password")
+        WebDriverWait(driver, 25).until(EC.presence_of_element_located((By.ID,'itemsinnavbar')))
         ele = driver.find_element_by_css_selector('a[href="#meetups"]')
         ele.click()
         submit = wait.until(EC.element_to_be_clickable((By.ID,'linkOfMeetUpHeading')))
