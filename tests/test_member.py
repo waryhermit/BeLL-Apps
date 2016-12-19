@@ -13,6 +13,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support import expected_conditions as EC
 
+from time import sleep
+
 # NOTICE: This code is totally ugly and needs refactoring, but I'm 
 #         just testing functionality before today's meeting.
 
@@ -29,14 +31,14 @@ class MemberTest(BaseCase):
         # get to the form page
         self.setup()
         # fill up the form without uploading a file
-        self.fill_form("a", data, True)
+        self.fill_form("c", data, True)
         #TODO: test new member login
         
         # adding already existing member
         # get back to the form page
         self.setup()
         # fill up the form without uploading a file
-        self.fill_form("a", data)
+        self.fill_form("c", data)
         #TODO: test new member login
 
 #        # adding new member and uploading file
@@ -58,13 +60,13 @@ class MemberTest(BaseCase):
         driver = self.driver
         
         # go to the login page
-        driver.get("http://127.0.0.1:5981/apps/_design/bell/MyApp/index.html")
+        driver.get(bell.get_url())
         # click on become a member button
         button = driver.find_element_by_link_text("Become a Member")
         button.click()
         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "memberform")))
         actual = driver.current_url
-        expected = "http://127.0.0.1:5981/apps/_design/bell/MyApp/index.html#member/add"
+        expected = bell.get_url() + "#member/add"
         self.assertEqual(actual, expected)
     
     def fill_form(self, fill, data, new, upload=False, attachment=None):
@@ -121,6 +123,7 @@ class MemberTest(BaseCase):
         button = driver.find_element_by_id("formButton")
         button.click()
         
+        sleep(5)
         # read the alert
         actual = Alert(driver).text
         if new:
@@ -132,7 +135,7 @@ class MemberTest(BaseCase):
         # test we're back to the login page
         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.NAME, "login")))
         actual = driver.current_url
-        expected = "http://127.0.0.1:5981/apps/_design/bell/MyApp/index.html#login"
+        expected = bell.get_url() + "#login"
         self.assertEqual(actual, expected)
         #TODO: login and test if attachment uploaded correctly
         
