@@ -59,9 +59,11 @@ class MeetupTest(BaseCase):
         elem.send_keys("11:00pm")
 
         elem = driver.find_element_by_name("category")
-
         select = Select(elem)
-        sleep(2)
+        while (len(select.options) < 1):
+            select = Select(elem)
+            sleep(10)
+        
         select.select_by_index(1)
 
         elem = driver.find_element_by_name("meetupLocation")
