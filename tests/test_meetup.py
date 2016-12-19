@@ -28,9 +28,10 @@ class MeetupTest(BaseCase):
         ele = driver.find_element_by_css_selector('a[href="#meetups"]')
         ele.click()
         ##driver.get("http://127.0.0.1:5981/apps/_design/bell/MyApp/index.html#meetups")
-
+        WebDriverWait(driver, 25).until(EC.presence_of_element_located((By.ID,'linkOfMeetUpHeading')))
         submit = wait.until(EC.element_to_be_clickable((By.ID,'linkOfMeetUpHeading')))
         submit.click()
+        print(submit.text)
         WebDriverWait(driver, 25).until(EC.presence_of_element_located((By.ID,'meetUpForm')))
         elem = driver.find_element_by_name("title")
         elem.send_keys("Test Meetup")
@@ -92,7 +93,7 @@ class MeetupTest(BaseCase):
             try:
                 submit = driver.find_element_by_xpath("//*[@id='parentLibrary']/table/tbody/tr[2]/td[4]/a")
                 submit.click()
-                WebDriverWait(driver, 25).until(EC.alert_is_present())
+                WebDriverWait(driver, 5).until(EC.alert_is_present())
                 #actual = Alert(driver).text
                 #expected = "Invitation sent successfully."
                 #self.assertEqual(actual, expected)
