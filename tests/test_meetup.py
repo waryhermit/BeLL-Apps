@@ -32,8 +32,8 @@ class MeetupTest(BaseCase):
         WebDriverWait(driver, 25).until(EC.presence_of_element_located((By.ID,'linkOfMeetUpHeading')))
         submit = wait.until(EC.element_to_be_clickable((By.ID,'linkOfMeetUpHeading')))
         ele = driver.find_element_by_css_selector('a[href="#meetup/add"]')
-        ele.send_keys(Keys.NULL)
-        ele.send_keys(Keys.ENTER)
+        submit.send_keys(Keys.NULL)
+        submit.send_keys(Keys.ENTER)
         ##submit.click()
        
         print(submit.text)
