@@ -32,7 +32,9 @@ class MeetupTest(BaseCase):
         submit = wait.until(EC.element_to_be_clickable((By.ID,'linkOfMeetUpHeading')))
         ##submit = driver.find_element_by_css_selector('a[href="#meetup/add"]')
        ## WebDriverWait(driver, 25).until(lambda submit: submit.is_enabled)
-        submit.click()
+        ele = driver.find_element_by_css_selector('a[href="#meetup/add"]')
+        ele.click()
+        ##submit.click()
        
         print(submit.text)
         WebDriverWait(driver, 25).until(EC.presence_of_element_located((By.ID,'meetUpForm')))
