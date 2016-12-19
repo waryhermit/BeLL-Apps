@@ -22,16 +22,15 @@ class MeetupTest(BaseCase):
     # http://www.seleniumhq.org/docs/06_test_design_considerations.jsp#page-object-design-pattern
    
     def create_Member(self,driver):
-        wait = WebDriverWait(driver, 10)
         bell.login(driver,"admin","password")
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID,'itemsinnavbar')))
+        WebDriverWait(driver, 25).until(EC.presence_of_element_located((By.ID,'itemsinnavbar')))
         ele = driver.find_element_by_css_selector('a[href="#meetups"]')
         ele.click()
         ##driver.get("http://127.0.0.1:5981/apps/_design/bell/MyApp/index.html#meetups")
 
         submit = wait.until(EC.element_to_be_clickable((By.ID,'linkOfMeetUpHeading')))
         submit.click()
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID,'meetUpForm')))
+        WebDriverWait(driver, 25).until(EC.presence_of_element_located((By.ID,'meetUpForm')))
         elem = driver.find_element_by_name("title")
         elem.send_keys("Test Meetup")
         elem = driver.find_element_by_name("description")
@@ -57,7 +56,7 @@ class MeetupTest(BaseCase):
         elem.send_keys("Test catagory")
         submit = driver.find_element_by_id("MeetUpformButton")
         submit.click()
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID,'formButton')))
+        WebDriverWait(driver, 25).until(EC.presence_of_element_located((By.ID,'formButton')))
 
 
     def test_add_new_meetup(self):
@@ -67,7 +66,7 @@ class MeetupTest(BaseCase):
 
         submit = driver.find_element_by_id("formButton")
         submit.click()
-        WebDriverWait(driver, 10).until(EC.alert_is_present())
+        WebDriverWait(driver, 25).until(EC.alert_is_present())
         actual = Alert(driver).text
         expected = "Invitation sent successfully."
         self.assertEqual(actual, expected)
@@ -77,7 +76,7 @@ class MeetupTest(BaseCase):
     def test_delete_meetup(self):
         """ comment"""
         driver = self.driver
-        wait = WebDriverWait(driver, 10)
+        wait = WebDriverWait(driver, 25)
         bell.login(driver,"admin","password")
         ele = driver.find_element_by_css_selector('a[href="#meetups"]')
         ele.click()
@@ -91,7 +90,7 @@ class MeetupTest(BaseCase):
             try:
                 submit = driver.find_element_by_xpath("//*[@id='parentLibrary']/table/tbody/tr[2]/td[4]/a")
                 submit.click()
-                WebDriverWait(driver, 10).until(EC.alert_is_present())
+                WebDriverWait(driver, 25).until(EC.alert_is_present())
                 #actual = Alert(driver).text
                 #expected = "Invitation sent successfully."
                 #self.assertEqual(actual, expected)
@@ -108,7 +107,7 @@ class MeetupTest(BaseCase):
          select = Select(elem)
          select.select_by_index(1)
 
-         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.NAME,'members')))
+         WebDriverWait(driver, 25).until(EC.presence_of_element_located((By.NAME,'members')))
          elem = driver.find_element_by_name("members")
          chkboxes = elem.find_elements_by_tag_name("input")
          for val in chkboxes:
@@ -116,7 +115,7 @@ class MeetupTest(BaseCase):
          sleep(1)
          submit = driver.find_element_by_id("formButton")
          submit.click()
-         WebDriverWait(driver, 10).until(EC.alert_is_present())
+         WebDriverWait(driver, 25).until(EC.alert_is_present())
          actual = Alert(driver).text
          expected = "Invitation sent successfully."
          self.assertEqual(actual, expected)
