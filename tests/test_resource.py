@@ -22,9 +22,8 @@ from string import ascii_lowercase
 class ResourceTest(BaseCase):
 
 #    Add New Resource - DONE
-#TODO: Think of a better test to check if resource was added successfully.
-
 #    Request Resource - DONE
+
 #    Add 2 Collections
 #    Add New Resource to Collection
 #    Merge Collections
@@ -51,6 +50,7 @@ class ResourceTest(BaseCase):
         
         # test form successfully submitted
         sleep(10)
+        actual = False
         elem = driver.find_element_by_xpath("//*[@id='parentLibrary']//table/tbody/tr/td[./p[contains(text(), '"+fill+"')]]")
         if fill in elem.text:
             actual = True
@@ -89,54 +89,89 @@ class ResourceTest(BaseCase):
                 self.new_resource_form("".join(choice(ascii_lowercase) for i in range(3)))
         return fill                 
 
-#    def test_request_resource(self):
-#        driver = self.driver
-#        self.setup_library()
-#        
-#        # access request form
-#        button = driver.find_element_by_id("requestResource")
-#        button.click()
-#        # fill out form
-#        elem = driver.find_element_by_name("request")
-#        elem.send_keys("test")
-#        # submit form
-#        button = driver.find_element_by_xpath("//*[@id='formButton']")
-#        button.click()
-#        
-#        # test alert
-#        actual = Alert(driver).text
-#        expected = "Request successfully sent."
-#        self.assertEqual(actual, expected)
-#        Alert(driver).accept()
-#        
-#        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "requestResource")))
-#        
-#        # test it's actually there
-#        button = driver.find_element_by_id("requestResource")
-#        button.click()
-#        # view all requests
-#        button = driver.find_element_by_xpath("//*[contains(text(), 'View All')]")
-#        button.click()
-#        # find submitted resource
-#        actual = False
-#        elem = driver.find_element_by_id("requestsTable")
-#        rows = elem.find_elements_by_tag_name("tr")
-#        for row in rows:
-#            if row.find_element_by_tag_name("td")[2].text == "test":
-#                actual = True
-#        expected = True
-#        self.assertEqual(actual, expected)
-#        
-#    def test_new_collection(self):
-#        driver = self.driver
-#        self.setup_library()
-#        
-#        # switch to collections
-#        elem = driver.find_element_by_xpath("//*[@id='labelOnResource']")
-#        link = elem.find_element_by_link_text("Collections")
-#        link.click()
-
+    def test_request_resource(self):
+        driver = self.driver
+        self.setup_library()
         
+        # fill string
+        fill = "".join(choice(ascii_lowercase) for i in range(3))
+        # access request form
+        button = driver.find_element_by_id("requestResource")
+        button.click()
+        # fill out form
+        elem = driver.find_element_by_name("request")
+        elem.send_keys(fill)
+        # submit form
+        button = driver.find_element_by_xpath("//*[@id='formButton']")
+        button.click()
+        
+        # test alert
+        actual = Alert(driver).text
+        expected = "Request successfully sent."
+        self.assertEqual(actual, expected)
+        Alert(driver).accept()
+        
+        sleep(5)
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "requestResource")))
+        
+        # test it's actually there
+        button = driver.find_element_by_id("requestResource")
+        button.click()
+        
+        # view all requests
+        button = driver.find_element_by_xpath("//*[contains(text(), 'View All')]")
+        button.click()
+        
+        # find submitted resource
+        actual = False
+        elem = driver.find_element_by_xpath("//*[@id='requestsTable']/tbody/tr[./td[contains(text(), '"+fill+"')]]")
+        if fill in elem.text:           
+            actual = True
+        expected = True
+        self.assertEqual(actual, expected)
+        
+    def test_new_collection(self):
+        driver = self.driver
+        self.setup_library()
+        
+        # switch to collections
+        elem = driver.find_element_by_xpath("//*[@id='labelOnResource']")
+        link = elem.find_element_by_link_text("Collections")
+        link.click()
+        
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "AddCollectionOnCollections")))
+        # save added collections
+        collections = []
+        # add new collection
+        collection = "".join(choice(ascii_lowercase) for i in range(3))
+        collections.append(collection)
+        button = driver.find_element_by_id("AddCollectionOnCollections")
+        button.click()
+        # fill out form
+        sleep(5)
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "invitationForm")))
+        fields = ["CollectionName", "Description"]
+        for field in fields:
+            elem = driver.find_element_by_xpath("//label[contains(@for, '"+field+"')]")
+            elem.send_keys(collection)         
+        # submit form
+        button = driver.find_element_by_link_text("Save")
+        button.click()
+        sleep(5)
+        
+        # test collection added successfully
+        actual = Alert(driver).text
+        expected = "Collection saved successfully."
+        self.assertEqual(actual, expected)
+        Alert(driver).accept()
+        
+        # test correct landing page
+        sleep(5)
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "AddCollectionOnCollections")))
+        actual = driver.current_url
+        expected = bell.get_url() + "#collection"
+        self.assertEqual(actual, expected)
+
     def setup_library(self):
         driver = self.driver
         
