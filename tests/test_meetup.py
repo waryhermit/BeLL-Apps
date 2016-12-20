@@ -137,25 +137,41 @@ class MeetupTest(BaseCase):
         # Delete any meetups made by test_meetup.py
         meetups = driver.find_elements_by_xpath("//*[@id='parentLibrary']/table/tbody/tr[contains(.,'test_meetup.py')]/td/a[@class='destroy btn btn-danger']")
         deleted = False
+        attempts = 0
         while (len(meetups) > 0):
-            meetups[0].click()
-            wait.until(EC.alert_is_present())
-            Alert(driver).accept()
-            wait.until(EC.staleness_of(meetups[0]))
-            # Reload list -- the list is stale now that we deleted one.
-            meetups = driver.find_elements_by_xpath("//*[@id='parentLibrary']/table/tbody/tr[contains(.,'Test')]/td/a[@class='destroy btn btn-danger']")
-            deleted = True
+            try:
+                meetups[0].click()
+                wait.until(EC.alert_is_present())
+                Alert(driver).accept()
+                wait.until(EC.staleness_of(meetups[0]))
+                # Reload list -- the list is stale now that we deleted one.
+                meetups = driver.find_elements_by_xpath("//*[@id='parentLibrary']/table/tbody/tr[contains(.,'Test')]/td/a[@class='destroy btn btn-danger']")
+                deleted = True
+            except:
+                attempts = attempts + 1
+                if (attempts > 5):
+                    deleted = False
+                    break
 
         self.assertTrue(deleted)
 
     def test_invite_member(self):
          driver = self.driver
+         wait = WebDriverWait(driver, 15)
          self.create_Meetup(self.driver,1)
-         invitationType = Select(driver.find_element_by_name("invitationType"))
+         elem = driver.find_element_by_name("invitationType")
+         wait.until(EC.element_to_be_clickable((By.NAME,'invitationType')))
+
+         invitationType = Select(elem)
+         
+         for opt in invitationType.options:
+             print(str(opt))
+
          invitationType.select_by_index(1)
 
-         WebDriverWait(driver, 25).until(EC.presence_of_element_located((By.NAME,'members')))
-         members_list = driver.find_element_by_name("members")
+
+         wait.until(EC.presence_of_element_located((By.NAME,'members')))
+         members_list = driver.find_element_by_name('members')
          chkboxes = members_list.find_elements_by_tag_name("input")
 
          for val in chkboxes:
