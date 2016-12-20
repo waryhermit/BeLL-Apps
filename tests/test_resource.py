@@ -46,15 +46,14 @@ class ResourceTest(BaseCase):
         sleep(3)
         
         # fill out new resource form
-        self.new_resource_form("ole")
+        fill = "ole"
+        fill = self.new_resource_form(fill)
         
         # test form successfully submitted
-        # TODO TODO fix this
-        elem = driver.find_element_by_tag_name("table")
-        rows = elem.find_elements_by_tag_name("tr")
-        for row in rows:
-            if row.find_element_by_tag_name("td").text == "ole":
-                actual = True
+        sleep(10)
+        elem = driver.find_element_by_xpath("//*[@id='parentLibrary']//table/tbody/tr/td[./p[contains(text(), '"+fill+"')]]")
+        if fill in elem.text:
+            actual = True
         expected = True
         self.assertEqual(actual, expected)
 
@@ -70,10 +69,9 @@ class ResourceTest(BaseCase):
         elem.clear()
         elem.send_keys("2016")
         
-        # TODO: dropdown still doesn't work, choosing default
         select = Select(driver.find_element_by_name("language"))
         select.select_by_value("English")
-        # TODO: fix dropdown, choosing default
+        
         elem_list = driver.find_elements_by_xpath("//*[contains(text(), 'Select an Option')]")
         for i in range(len(elem_list)):
             elem_list[i].click()
@@ -88,7 +86,8 @@ class ResourceTest(BaseCase):
         except:
             if Alert(driver) and Alert(driver).text == "Title already exists.":
                 Alert(driver).accept()
-                self.new_resource_form("".join(choice(ascii_lowercase) for i in range(3)))                 
+                self.new_resource_form("".join(choice(ascii_lowercase) for i in range(3)))
+        return fill                 
 
 #    def test_request_resource(self):
 #        driver = self.driver
