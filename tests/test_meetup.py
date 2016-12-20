@@ -15,133 +15,172 @@ from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.keys import Keys
+
 from time import sleep
+
 @on_platforms(browsers)
 class MeetupTest(BaseCase):
-    """description of class"""
-    # http://www.seleniumhq.org/docs/06_test_design_considerations.jsp#page-object-design-pattern
    
-    def create_Member(self,driver):
-        wait = WebDriverWait(driver, 25)
+    def create_Meetup(self,driver, numdays, cancel=False, recurring=False):
+        wait = WebDriverWait(driver, 30)
         bell.login(driver,"admin","password")
-        WebDriverWait(driver, 25).until(EC.presence_of_element_located((By.ID,'itemsinnavbar')))
-        ele = driver.find_element_by_css_selector('a[href="#meetups"]')
-        ele.click()
-        WebDriverWait(driver, 25).until(EC.presence_of_element_located((By.ID,'linkOfMeetUpHeading')))
-        submit = wait.until(EC.element_to_be_clickable((By.ID,'linkOfMeetUpHeading')))
-        ele = driver.find_element_by_css_selector('a[href="#meetup/add"]')
+        self.assertTrue(self.go_to_meetups(driver))
+
+        # Make sure the'Add Meetup' button is there and press it. Keep clicking the button till its gone.
+        addMeetupBtn = wait.until(EC.element_to_be_clickable((By.ID,'linkOfMeetUpHeading')))
 
         keepclicking = True
         while (keepclicking):
             try:
-                submit.click()
+                addMeetupBtn.click()
                 sleep(1)
             except:
                 keepclicking = False
 
-        WebDriverWait(driver, 25).until(EC.presence_of_element_located((By.ID,'meetUpForm')))
+        # Wait for the form to appear and fill it out.
+        wait.until(EC.presence_of_element_located((By.ID,'meetUpForm')))
+        wait.until(EC.element_to_be_clickable((By.NAME,'title')))
+        
         elem = driver.find_element_by_name("title")
-        elem.send_keys("Test Meetup")
+        elem.send_keys("test_meetup.py - Test Meetup")
         elem = driver.find_element_by_name("description")
         elem.send_keys("This is a test meeting automatically created by test_meetup.py")
         elem = driver.find_element_by_name("startDate")
-        elem.send_keys(datetime.datetime.now().strftime('%d/%m/%Y'))
+        elem.send_keys(datetime.datetime.now().strftime('%m/%d/%Y'))
         elem = driver.find_element_by_name("endDate")
-        i = datetime.datetime.now() + datetime.timedelta(days=1)
-        elem.send_keys(i.strftime('%d/%m/%Y'))
+        endDate = datetime.datetime.now() + datetime.timedelta(days=numdays)
+        elem.send_keys(endDate.strftime('%m/%d/%Y'))
 
         elem = driver.find_element_by_name("startTime")
         elem.send_keys("8:00am")
-
-
         elem = driver.find_element_by_name("endTime")
         elem.send_keys("11:00pm")
 
         elem = driver.find_element_by_name("category")
         wait.until(EC.element_to_be_clickable((By.NAME,'category')))
-        sleep(5)
         select = Select(elem)
         select.select_by_value('E Learning')
 
         elem = driver.find_element_by_name("meetupLocation")
         elem.send_keys("Test catagory")
-        submit = driver.find_element_by_id("MeetUpformButton")
-        submit.click()
-        WebDriverWait(driver, 25).until(EC.presence_of_element_located((By.ID,'formButton')))
+        if (recurring):
+            recurring_radio = driver.find_element_by_css_selector('input[type="radio"]')
+            recurring_radio.click()
+            WebDriverWait(driver, 25).until(EC.element_located_to_be_selected((By.ID, recurring_radio.get_attribute("id"))))
 
+        if (cancel == False):
+            # Bring up the invite page, since this is a new meetup.
+            submit = driver.find_element_by_id("MeetUpformButton")
+            submit.click()
+            wait.until(EC.presence_of_element_located((By.ID,'formButton')))
+        return True
+    def go_to_meetups(self, driver):
+        wait = WebDriverWait(driver, 15)
+         # Go to the meetups tab
+        wait.until(EC.element_to_be_clickable((By.ID,'itemsinnavbar')))
+        old_page = driver.find_element_by_id('dashboard')
+        meetups_tab = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR,'a[href="#meetups"]')))
+        meetups_tab.click()
 
-    def test_add_new_meetup(self):
-        """ comment"""
-        driver = self.driver
-        self.create_Member(driver)
+        # Clicking on the meetups link doesn't always work, so keep trying until we are at the meetups page.
+        # This might only be needed due to a bug in the site see: https://github.com/open-learning-exchange/BeLL-Apps/issues/585
+        keeptrying = True
+        numoftries = 0
+        while (keeptrying):
+            try:
+                # If the old page is stale then we are on the meetups tab.
+                wait.until(EC.staleness_of(old_page))
+                keeptrying = False
+            except TimeoutException:
+                meetups_tab = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR,'a[href="#meetups"]')))
+                meetups_tab.click()
+                numoftrys = numoftries + 1
+                if (numoftries == 4):
+                    # If we still haven't got there something else went wrong.
+                    keeptrying = False
+                    return False
 
-        submit = driver.find_element_by_id("formButton")
-        submit.click()
+        wait.until(EC.presence_of_element_located((By.ID,'linkOfMeetUpHeading')))
+        return True
+
+    def save_meetup(self, driver):
+        try:
+            submit = driver.find_element_by_id("formButton")
+            submit.click()
+        except (TimeoutException, NoSuchElementException) as e:
+            print("Could not submit invatations. Check that you navigated to the invation screen and that formButton exists.")
+            return False
+        
         WebDriverWait(driver, 25).until(EC.alert_is_present())
         actual = Alert(driver).text
         expected = "Invitation sent successfully."
-        self.assertEqual(actual, expected)
         Alert(driver).accept()
-        
+        return (actual == expected)    
 
+    def test_add_new_meetup_singleday(self):
+        driver = self.driver
+        self.create_Meetup(driver, 1)
+        self.assertTrue(self.save_meetup(driver))
+        
     def test_delete_meetup(self):
-        """ comment"""
         driver = self.driver
         wait = WebDriverWait(driver, 25)
         bell.login(driver,"admin","password")
-        WebDriverWait(driver, 25).until(EC.presence_of_element_located((By.ID,'itemsinnavbar')))
-        ele = driver.find_element_by_css_selector('a[href="#meetups"]')
-        ele.click()
-        submit = wait.until(EC.element_to_be_clickable((By.ID,'linkOfMeetUpHeading')))
+        self.assertTrue(self.go_to_meetups(driver))
+
+        # Check if there is at least one row of meetups.
         try:
             submit = driver.find_element_by_xpath("//*[@id='parentLibrary']/table/tbody/tr[2]/td[4]/a")
         except NoSuchElementException:
-            self.assertFalse(True)
-        exists = True
-        while exists:
-            try:
-                submit = driver.find_element_by_xpath("//*[@id='parentLibrary']/table/tbody/tr[2]/td[4]/a")
-                submit.click()
-                WebDriverWait(driver, 5).until(EC.alert_is_present())
-                #actual = Alert(driver).text
-                #expected = "Invitation sent successfully."
-                #self.assertEqual(actual, expected)
-                Alert(driver).accept()
-            except (NoSuchElementException, TimeoutException) as e:
-                exists = False
+            self.assertFalse(True) # Nothing to delete.
         
-        self.assertTrue(True)
+        # Delete any meetups made by test_meetup.py
+        meetups = driver.find_elements_by_xpath("//*[@id='parentLibrary']/table/tbody/tr[contains(.,'test_meetup.py')]/td/a[@class='destroy btn btn-danger']")
+        deleted = False
+        while (len(meetups) > 0):
+            meetups[0].click()
+            wait.until(EC.alert_is_present())
+            Alert(driver).accept()
+            wait.until(EC.staleness_of(meetups[0]))
+            # Reload list -- the list is stale now that we deleted one.
+            meetups = driver.find_elements_by_xpath("//*[@id='parentLibrary']/table/tbody/tr[contains(.,'Test')]/td/a[@class='destroy btn btn-danger']")
+            deleted = True
+
+        self.assertTrue(deleted)
 
     def test_invite_member(self):
          driver = self.driver
-         self.create_Member(self.driver)
-         elem = driver.find_element_by_name("invitationType")
-         select = Select(elem)
-         select.select_by_index(1)
+         self.create_Meetup(self.driver,1)
+         invitationType = Select(driver.find_element_by_name("invitationType"))
+         invitationType.select_by_index(1)
 
          WebDriverWait(driver, 25).until(EC.presence_of_element_located((By.NAME,'members')))
-         elem = driver.find_element_by_name("members")
-         chkboxes = elem.find_elements_by_tag_name("input")
+         members_list = driver.find_element_by_name("members")
+         chkboxes = members_list.find_elements_by_tag_name("input")
+
          for val in chkboxes:
             val.click()
+         
          sleep(1)
-         submit = driver.find_element_by_id("formButton")
-         submit.click()
-         WebDriverWait(driver, 25).until(EC.alert_is_present())
-         actual = Alert(driver).text
-         expected = "Invitation sent successfully."
-         self.assertEqual(actual, expected)
-         Alert(driver).accept()
+         self.assertTrue(self.save_meetup(driver))
 
-    #def test_multiday_meetup(self):
-    #    """ comment"""
-    #def test_singleday_meetup(self):
-    #    """ comment"""
-    #def recurring_meetup(self):
-    #    """ comment"""
+    def test_multiday_meetup(self):
+        driver = self.driver
+        self.create_Meetup(driver,3)
+        self.assertTrue(self.save_meetup(driver))
 
+    def test_recurring_meetup(self):
+        driver = self.driver
+        self.assertTrue(self.create_Meetup(self.driver,1,recurring=True))
+        self.assertTrue(self.save_meetup(driver))
 
+    def test_cancel_meetup(self):
+        driver = self.driver
+        self.create_Meetup(self.driver,1, cancel=True)
+        cancel = WebDriverWait(driver, 25).until(EC.element_to_be_clickable((By.ID,'MeetUpcancel')))
+        cancel.click()
+        WebDriverWait(driver, 25).until(EC.presence_of_element_located((By.ID,'linkOfMeetUpHeading')))
+        self.assertEqual(driver.current_url, 'http://127.0.0.1:5981/apps/_design/bell/MyApp/index.html#meetups')
 
     if __name__ == "__main__":
         unittest.main()
