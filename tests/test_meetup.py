@@ -163,12 +163,11 @@ class MeetupTest(BaseCase):
          wait.until(EC.element_to_be_clickable((By.NAME,'invitationType')))
 
          invitationType = Select(elem)
-         
+         index = 0
          for opt in invitationType.options:
-             print(str(opt))
-
-         invitationType.select_by_index(1)
-
+             if (index == 1):
+                opt.click()
+             index = index + 1
 
          wait.until(EC.presence_of_element_located((By.NAME,'members')))
          members_list = driver.find_element_by_name('members')
