@@ -1,2 +1,7 @@
 .DS_Store
 .idea
+/tests/__pycache__
+/tests/.vs
+/tests/tests.sln
+/tests/tests.pyproj
+/tests/geckodriver.log
