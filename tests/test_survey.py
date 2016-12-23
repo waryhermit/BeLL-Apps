@@ -1,5 +1,5 @@
+"""This module is used to test the survey funtionality of the BeLL app. """
 import unittest
-from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -11,6 +11,8 @@ from base_case import BaseCase, browsers, on_platforms
 
 @on_platforms(browsers)
 class SurveyTest(BaseCase):
+    """Contains the unit tests and helper functions required to test
+     the survey features of the BeLL app."""
 
     def setUp(self):
         self.accept_next_alert = True
@@ -18,6 +20,7 @@ class SurveyTest(BaseCase):
         print("setup ran")
 
     def test_add_surveys(self):
+        """Adds two surveys"""
 
         driver = self.driver
         bell.login(driver, "admin", "password")
@@ -34,6 +37,7 @@ class SurveyTest(BaseCase):
         self.choose_users()
 
     def test_delete_survey(self):
+        """Tests the process of deleting a survey."""
         driver = self.driver
         bell.login(driver, "admin", "password")
         self.go_to_surveys()
@@ -44,87 +48,109 @@ class SurveyTest(BaseCase):
         self.assertTrue(self.delete_survey())
 
     def go_to_surveys(self):
+        """Navigates to the survey page"""
         driver = self.driver
-        wait = WebDriverWait(driver, 5)
+        wait = WebDriverWait(driver, 15)
         driver.find_element_by_id("NationManagerLink").click()
-
-        survey_btn = WebDriverWait(driver, 15).until(
-            EC.element_to_be_clickable((By.XPATH, '//*[@id="surveys"]/tbody/tr[1]/th/a')))
+        btn_xpath = '//*[@id="surveys"]/tbody/tr[1]/th/a'
+        wait.until(EC.element_to_be_clickable((By.XPATH, btn_xpath)))
+        survey_btn = driver.find_element_by_xpath(btn_xpath)
         old_page = survey_btn
         survey_btn.click()
 
-        # Clicking on the surveys link doesn't always work, so keep trying until we are at the meetups page.
+        # Clicking on the surveys link doesn't always work,
+        # so keep trying until we are at the meetups page.
         # This might only be needed due to a bug in the site see:
         # https://github.com/open-learning-exchange/BeLL-Apps/issues/585
+        wait = WebDriverWait(driver, 5)
         keeptrying = True
         numoftries = 0
-        while (keeptrying):
+        survay_xpath = '//*[@id="surveys"]/tbody/tr[1]/th/a'
+        while keeptrying:
             try:
                 # If the old page is stale then we are on the meetups tab.
                 wait.until(EC.staleness_of(old_page))
                 keeptrying = False
             except TimeoutException:
-                survey_btn = wait.until(EC.element_to_be_clickable(
-                    (By.XPATH, '//*[@id="surveys"]/tbody/tr[1]/th/a')))
+                wait.until(EC.element_to_be_clickable(
+                    (By.XPATH, survay_xpath)))
+                survey_btn = driver.find_element_by_xpath(survay_xpath)
                 survey_btn.click()
-                numoftrys = numoftries + 1
-                if (numoftries == 6):
+                numoftries = numoftries + 1
+                if numoftries == 6:
                     # If we still haven't got there something else went wrong.
                     keeptrying = False
                     return False
 
     def delete_survey(self):
+        """Deletes a survey"""
         driver = self.driver
-        delete_btn = WebDriverWait(driver, 30).until(EC.element_to_be_clickable(
-            (By.XPATH, '//*[@id="parentDiv"]/table/tbody/tr[2]/td[7]/a[3]')))
+        wait = WebDriverWait(driver, 30)
+        delete_xpath = '//*[@id="parentDiv"]/table/tbody/tr[2]/td[7]/a[3]'
+        wait.until(EC.element_to_be_clickable((By.XPATH, delete_xpath)))
+        delete_btn = driver.find_element_by_xpath(delete_xpath)
         delete_btn.click()
-        return ("Are you sure you want to delete this survey?" == self.close_alert_and_get_its_text())
+        expected = "Are you sure you want to delete this survey?"
+        result = self.close_alert_and_get_its_text()
+        return expected == result
 
     def add_survey(self):
+        """Adds a survey."""
         driver = self.driver
         # TODO: Check url
-        driver = self.driver
-        survey_add_btn = WebDriverWait(driver, 30).until(
-            EC.element_to_be_clickable((By.XPATH, "//a[contains(@href, '#survey/add')]")))
+        wait = WebDriverWait(driver, 30)
+        add_xpath = "//a[contains(@href, '#survey/add')]"
+        wait.until(EC.element_to_be_clickable((By.XPATH, add_xpath)))
+        survey_add_btn = driver.find_element_by_xpath(add_xpath)
         survey_add_btn.click()
-        survey_name = WebDriverWait(driver, 30).until(
-            EC.element_to_be_clickable((By.NAME, "SurveyTitle")))
+
+        wait.until(EC.element_to_be_clickable((By.NAME, "SurveyTitle")))
+        survey_name = driver.find_element_by_name("SurveyTitle")
         survey_name.clear()
         survey_name.send_keys("Test Survey")
-        save_btn = WebDriverWait(driver, 30).until(
-            EC.element_to_be_clickable((By.NAME, "save")))
+        wait.until(EC.element_to_be_clickable((By.NAME, "save")))
+        save_btn = driver.find_element_by_name("save")
         save_btn.click()
-        WebDriverWait(driver, 30).until(EC.alert_is_present())
-        return ("Survey Saved!" == self.close_alert_and_get_its_text())
+        wait.until(EC.alert_is_present())
+        expected = "Survey Saved!"
+        result = self.close_alert_and_get_its_text()
+        return result == expected
 
     def add_survey_question(self):
+        """Adds a survey. Does not fill it our or save it."""
         driver = self.driver
-        wait = WebDriverWait(driver, 5)
-
+        short_wait = WebDriverWait(driver, 5)
+        long_wait = WebDriverWait(driver, 30)
         # driver.find_element_by_id("addQuestion").click()
-        addQuestion = WebDriverWait(driver, 30).until(
-            EC.element_to_be_clickable((By.ID, "addQuestion"))).click()
-        # Clicking on the surveys link doesn't always work, so keep trying until we are at the meetups page.
+        long_wait.until(EC.element_to_be_clickable((By.ID, "addQuestion")))
+        add_question = driver.find_element_by_id("addQuestion")
+        add_question.click()
+        # Clicking on the surveys link doesn't always work,
+        # so keep trying until we are at the meetups page.
         # This might only be needed due to a bug in the site see:
         # https://github.com/open-learning-exchange/BeLL-Apps/issues/585
         keeptrying = True
         numoftries = 0
-        while (keeptrying):
+
+        while keeptrying:
             try:
                 # If the old page is stale then we are on the meetups tab.
-                wait.until(EC.staleness_of(addQuestion))
+                short_wait.until(EC.staleness_of(add_question))
                 keeptrying = False
             except TimeoutException:
-                add_new_question = WebDriverWait(driver, 30).until(
-                    EC.element_to_be_clickable((By.ID, "add_new_question")))
+                long_wait.until(EC.element_to_be_clickable(
+                    (By.ID, "add_new_question")))
+                add_new_question = driver.find_element_by_id(
+                    "add_new_question")
                 add_new_question.click()
-                numoftrys = numoftries + 1
-                if (numoftries == 6):
+                numoftries = numoftries + 1
+                if numoftries == 6:
                     # If we still haven't got there something else went wrong.
                     keeptrying = False
                     return False
 
     def multiple_choice_question(self):
+        """"Fills out the information for a multiple choice question."""
         driver = self.driver
         driver.find_element_by_id("question_text").clear()
         driver.find_element_by_id("question_text").send_keys(
@@ -136,17 +162,19 @@ class SurveyTest(BaseCase):
         self.save_question()
 
     def rating_question(self):
+        """"Fills out the information for a rating question."""
         driver = self.driver
-        WebDriverWait(driver, 30).until(
-            EC.element_to_be_clickable((By.ID, "add_new_question")))
-        Select(driver.find_element_by_id("add_new_question")
-               ).select_by_visible_text("Rating Scale")
-        driver.find_element_by_xpath(
-            "(//textarea[@id='question_text'])[4]").clear()
-        driver.find_element_by_xpath(
-            "(//textarea[@id='question_text'])[4]").send_keys("This is another test question.")
-        Select(driver.find_element_by_id("select_rating")
-               ).select_by_visible_text("5 ratings")
+        wait = WebDriverWait(driver, 30)
+        wait.until(EC.element_to_be_clickable((By.ID, "add_new_question")))
+        add_q_type = driver.find_element_by_id("add_new_question")
+        Select(add_q_type).select_by_visible_text("Rating Scale")
+        q_txt_xpath = "(//textarea[@id='question_text'])[4]"
+        q_text = driver.find_element_by_xpath(q_txt_xpath)
+        q_text.clear()
+        q_text.send_keys("This is another test question.")
+
+        select_rating = driver.find_element_by_id("select_rating")
+        Select(select_rating).select_by_visible_text("5 ratings")
 
         rating1_label = driver.find_element_by_name("rating1_label")
         driver.execute_script(
@@ -202,28 +230,34 @@ class SurveyTest(BaseCase):
         self.save_question()
 
     def single_text_question(self):
+        """"Fills out the information for a single line text question."""
+
         driver = self.driver
-        Select(driver.find_element_by_id("add_new_question")
-               ).select_by_visible_text("Single Textbox")
-        driver.find_element_by_xpath(
-            "(//textarea[@id='question_text'])[2]").clear()
-        driver.find_element_by_xpath("(//textarea[@id='question_text'])[2]").send_keys(
-            "You must enter some text for this question.")
-        driver.find_element_by_xpath(
-            "(//input[@id='required_question'])[2]").click()
+        add_new_q = driver.find_element_by_id("add_new_question")
+        Select(add_new_q).select_by_visible_text("Single Textbox")
+        text_xpath = "(//textarea[@id='question_text'])[2]"
+        q_text = driver.find_element_by_xpath(text_xpath)
+        q_text.clear()
+        q_text.send_keys("You must enter some text for this question.")
+        req_xpath = "(//input[@id='required_question'])[2]"
+        is_required = driver.find_element_by_xpath(req_xpath)
+        is_required.click()
         self.save_question()
 
     def multiline_text_question(self):
+        """"Fills out the information for a paragraph text question."""
         driver = self.driver
-        Select(driver.find_element_by_id("add_new_question")
-               ).select_by_visible_text("Comment/Essay Box")
-        driver.find_element_by_xpath(
-            "(//textarea[@id='question_text'])[3]").clear()
-        driver.find_element_by_xpath(
-            "(//textarea[@id='question_text'])[3]").send_keys("This is an optional question.")
+        question_type = driver.find_element_by_id("add_new_question")
+        select_question_type = Select(question_type)
+        select_question_type.select_by_visible_text("Comment/Essay Box")
+        q_txt_xpath = "(//textarea[@id='question_text'])[3]"
+        q_txt = driver.find_element_by_xpath(q_txt_xpath)
+        q_txt.clear()
+        q_txt.send_keys("This is an optional question.")
         self.save_question()
 
     def rearrange_questions(self):
+        """Moves the questions around. Not finished."""
         driver = self.driver
         driver.find_element_by_id("Rearrange").click()
         driver.find_element_by_id("movedown").click()
@@ -235,17 +269,21 @@ class SurveyTest(BaseCase):
         driver.find_element_by_id("Rearrange").click()
 
     def save_question(self):
+        """Saves the currently open question."""
         driver = self.driver
-        save_btn = WebDriverWait(driver, 30).until(
-            EC.presence_of_element_located((By.XPATH, '//*[@id="1"]/div/input')))
-        driver.execute_script(
-            "return arguments[0].scrollIntoView();", save_btn)
+        wait = WebDriverWait(driver, 30)
+        x_path = '//*[@id="1"]/div/input'
+        wait.until(EC.presence_of_element_located((By.XPATH, x_path)))
+        save_btn = driver.find_element_by_xpath(x_path)
+        scroll_script = "return arguments[0].scrollIntoView();"
+        driver.execute_script(scroll_script, save_btn)
         save_btn.click()
-
-        self.assertEqual("Question has been saved",
-                         self.close_alert_and_get_its_text())
+        expected = "Question has been saved"
+        result = self.close_alert_and_get_its_text()
+        self.assertEqual(expected, result)
 
     def choose_users_by_criteria(self):
+        """Not Finished."""
         driver = self.driver
         driver.find_element_by_css_selector("button.btn.btn-info").click()
         driver.find_element_by_name("genderSelector").click()
@@ -276,6 +314,7 @@ class SurveyTest(BaseCase):
         driver.find_element_by_id("returnBack").click()
 
     def choose_users(self):
+        """Selects all users in the first BeLL."""
         driver = self.driver
         driver.find_element_by_xpath(
             "//div[@id='main-body']/div/button[3]").click()
@@ -290,6 +329,7 @@ class SurveyTest(BaseCase):
                          self.close_alert_and_get_its_text())
 
     def close_alert_and_get_its_text(self):
+        """"Closes the currently open alert and returns its text."""
         try:
             alert = self.driver.switch_to.alert
             alert_text = alert.text
@@ -300,5 +340,8 @@ class SurveyTest(BaseCase):
             return alert_text
         finally:
             self.accept_next_alert = True
+
+
 if __name__ == '__main__':
+
     unittest.main()
