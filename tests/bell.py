@@ -204,10 +204,5 @@ def pick_level():
     levels = [str(i) for i in range(1, 13)]
     levels.append("Higher")
     return choice(levels)
-    
 
-
-    
-    
-    
-
+#TODO: add_resource, add_community, etc.
