@@ -45,6 +45,8 @@ before_install:
   - curl -X PUT 'http://127.0.0.1:5981/_config/log/file' -d '"/usr/local/var/log/couchdb/couch.log"'
   - curl -X PUT 'http://127.0.0.1:5981/_config/httpd/allow_jsonp' -d '"true"'
   - curl -X PUT 'http://127.0.0.1:5981/_config/admins/nation' -d '"oleoleole"'
+  - npm install -g codecept.js
+  - npm install -g webdriverio
 
 script:
   - export
@@ -52,3 +54,4 @@ script:
   - curl -X GET http://127.0.0.1:5981/_all_dbs
   - i=$(curl -X GET http://127.0.0.1:5981/_all_dbs | jq length); if [ $i -ne 38 ]; then exit 1; fi
   - python -m unittest discover tests
+  - codeceptjs run .
