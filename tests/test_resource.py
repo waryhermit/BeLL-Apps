@@ -24,7 +24,7 @@ class ResourceTest(BaseCase):
 #    Add New Resource - DONE
 #    Request Resource - DONE
 
-#    Add 2 Collections
+#    Add 2 Collections - ADD ONE MORE
 #    Add New Resource to Collection
 #    Merge Collections
 #    Delete Resource
@@ -166,7 +166,7 @@ class ResourceTest(BaseCase):
         Alert(driver).accept()
         
         # test correct landing page
-        sleep(5)
+        sleep(10)
         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "AddCollectionOnCollections")))
         actual = driver.current_url
         expected = bell.get_url() + "#collection"
