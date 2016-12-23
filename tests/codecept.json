@@ -5,18 +5,22 @@
   "helpers": {
     "WebDriverIO": {
       "url": "http://127.0.0.1:5981/apps/_design/bell/MyApp/index.html#login",
-      "browser": "firefox",
-      "timeouts": {
-         "script": 600000,
-         "page load": 100000,
-         "implicit" : 50000
-      }
-    }
-  },
+      "user": "dogi",
+            "key": "nZThUtFEGnBbCmPHQubP3O+BxV7IuyIXnMisSolRbgitwb3hfeG7CLEQPe  +DefM3uAU/zrHKAyNbJmmpDL+UzrLN4K4V8t1kXtejOsalGTyeZcjufs8zcx/ZtlfRvdhgDQ37MUyGYN4+ZaF5HVTPT5QXdCrSklXRE8rHsL31QGC+SgVUfQCQ1g3qCIpfPrudFZ9yg8LrJ646o8e1LBbyGKO9AC3wHjeMyyLbuYMtTG7CjzqmgJ1v1ScK8XJs5m+MM8Z1NAb3F7fhmS25PCMhupUUZ21KO958xh4w8mlNGE9Z+wEAuQ1csdh5RxqLnlprGaTvjtX9hgek6KXpURNX6Nd0MCqCDygtt5xliN1Juk6FIxvBcP1KVEfTRNWmMExh4YEZIsuL5Dnp3qoXT95RfGlOIzk1GNJIYlgpBJZsfSSLTBHSLJ0TO4HpucoSm9b6UXpqHtcvCcE8z2yvtLIzezTGecDbLaGlNskS/tVg2Rq32l1asktKrxHrG7A+3hWQVdc3NOWVSm5EbpqNKtAwiSry9VVXVqN5NmiqQiq8gaBobNrmVec+69WCfEInKIY8mTXavkfpNmdL2z/1V0KuDNiK2+qCgQALQqKTQN13uFwvyRO6JPty141L3SQobdl0T2L9BHQBchmGrMJzRO7giMeY1zWINrtzvlhr+6TR4ks=",
+            "desiredCapabilities": {
+                "browserName": "firefox",
+                "timeouts": {
+                    "script": 600000,
+                    "page load": 100000,
+                    "implicit" : 50000
+                }
+             }
+    },
   "include": {
     "I": "./steps_file.js"
   },
   "bootstrap": false,
   "mocha": {},
   "name": "tests"
+  },
 }
