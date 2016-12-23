@@ -20,17 +20,23 @@ from string import ascii_lowercase
 
 @on_platforms(browsers)
 class ResourceTest(BaseCase):
-
-#    Add New Resource - DONE
-#    Request Resource - DONE
-
-#    Add 2 Collections - ADD ONE MORE
-#    Add New Resource to Collection
-#    Merge Collections
-#    Delete Resource
-#    Delete Collections
+    """ Tests adding one resource, creating two collections,
+    adding the resource to one collection, merging the two
+    collections, and deleting both the resource and the collection.
+    """
+    #TODO: Add Upload File with Resource
+    #TODO: Add one more Collection
+    #TODO: Add New Resource to Collection
+    #TODO: Merge Collections
+    #TODO: Delete Resource
+    #TODO: Delete Collection
 
     def test_add_resource(self):
+        """ NoneType -> NoneType
+
+        Adds a resource and tests that the resource 
+        was successfully added.
+        """
         driver = self.driver
         self.setup_library()
         
@@ -58,6 +64,12 @@ class ResourceTest(BaseCase):
         self.assertEqual(actual, expected)
 
     def new_resource_form(self, fill):
+        """ string -> string
+
+        Fills in the form for a new resource, if the resource is 
+        not present yet, otherwise creates a new resource. 
+        Returns the resource title.
+        """
         driver = self.driver
         fields = ["title", "author", "Publisher", "linkToLicense"]
         for field in fields:
@@ -90,6 +102,11 @@ class ResourceTest(BaseCase):
         return fill                 
 
     def test_request_resource(self):
+        """ NoneType -> NoneType
+
+        Posts a request for a resource, and tests that the 
+        request was correctly registered.
+        """
         driver = self.driver
         self.setup_library()
         
@@ -122,7 +139,7 @@ class ResourceTest(BaseCase):
         button = driver.find_element_by_xpath("//*[contains(text(), 'View All')]")
         button.click()
         
-        # find submitted resource
+        # find submitted request
         actual = False
         elem = driver.find_element_by_xpath("//*[@id='requestsTable']/tbody/tr[./td[contains(text(), '"+fill+"')]]")
         if fill in elem.text:           
@@ -131,6 +148,11 @@ class ResourceTest(BaseCase):
         self.assertEqual(actual, expected)
         
     def test_new_collection(self):
+        """ NoneType -> NoneType
+
+        Creates a new collection and tests that it is correctly
+        added.
+        """
         driver = self.driver
         self.setup_library()
         
@@ -174,6 +196,10 @@ class ResourceTest(BaseCase):
         self.assertEqual(actual, expected)
 
     def setup_library(self):
+        """ NoneType -> NoneType
+
+        Helper function to get to the resource page
+        """
         driver = self.driver
         
         # login
