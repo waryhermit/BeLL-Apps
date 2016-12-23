@@ -123,8 +123,8 @@ def add_member(driver, first_name = "", last_name = "", middle_name = "",
             data[i] = pick_string()
     for field, datum in zip(fields, data):
         elem = driver.find_element_by_name(field)
-            elem.clear()
-            elem.send_keys(datum)
+        elem.clear()
+        elem.send_keys(datum)
     
     if birthdate == []:
         birthdate = pick_birthdate()
