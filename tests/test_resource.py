@@ -139,6 +139,7 @@ class ResourceTest(BaseCase):
         link = elem.find_element_by_link_text("Collections")
         link.click()
         
+        sleep(5)
         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "AddCollectionOnCollections")))
         # save added collections
         collections = []
@@ -148,7 +149,7 @@ class ResourceTest(BaseCase):
         button = driver.find_element_by_id("AddCollectionOnCollections")
         button.click()
         # fill out form
-        sleep(20)
+        sleep(5)
         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "invitationForm")))
         fields = ["CollectionName", "Description"]
         for field in fields:
