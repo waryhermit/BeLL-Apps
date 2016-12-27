@@ -1,7 +1,10 @@
 """This module is used to test the survey funtionality of the BeLL app. """
 import unittest
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import (NoSuchElementException,
+                                        StaleElementReferenceException,
+                                        TimeoutException)
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select, WebDriverWait
 
@@ -17,7 +20,6 @@ class SurveyTest(BaseCase):
     def setUp(self):
         self.accept_next_alert = True
         BaseCase.setUp(self)
-        print("setup ran")
 
     def test_add_surveys(self):
         """Adds two surveys"""
@@ -97,7 +99,6 @@ class SurveyTest(BaseCase):
     def add_survey(self):
         """Adds a survey."""
         driver = self.driver
-        # TODO: Check url
         wait = WebDriverWait(driver, 30)
         add_xpath = "//a[contains(@href, '#survey/add')]"
         wait.until(EC.element_to_be_clickable((By.XPATH, add_xpath)))
@@ -119,12 +120,20 @@ class SurveyTest(BaseCase):
     def add_survey_question(self):
         """Adds a survey. Does not fill it our or save it."""
         driver = self.driver
-        short_wait = WebDriverWait(driver, 5)
-        long_wait = WebDriverWait(driver, 30)
+        short_wait = WebDriverWait(driver, 10)
+        long_wait = WebDriverWait(driver, 25)
+        numoftries = 0
         # driver.find_element_by_id("addQuestion").click()
-        long_wait.until(EC.element_to_be_clickable((By.ID, "addQuestion")))
-        add_question = driver.find_element_by_id("addQuestion")
-        add_question.click()
+        while numoftries < 3:
+            try:
+                long_wait.until(
+                    EC.element_to_be_clickable((By.ID, "addQuestion")))
+                add_question = driver.find_element_by_id("addQuestion")
+                add_question.click()
+                numoftries = numoftries + 1
+            except (TimeoutException, StaleElementReferenceException):
+                numoftries = numoftries + 1
+
         # Clicking on the surveys link doesn't always work,
         # so keep trying until we are at the meetups page.
         # This might only be needed due to a bug in the site see:
@@ -135,18 +144,25 @@ class SurveyTest(BaseCase):
         while keeptrying:
             try:
                 # If the old page is stale then we are on the meetups tab.
-                short_wait.until(EC.staleness_of(add_question))
+                # short_wait.until(EC.staleness_of(add_question))
+                short_wait.until(EC.visibility_of_element_located(
+                    (By.ID, "dialog")))
                 keeptrying = False
+                print("got stale")
+
             except TimeoutException:
                 long_wait.until(EC.element_to_be_clickable(
-                    (By.ID, "add_new_question")))
+                    (By.ID, "addQuestion")))
                 add_new_question = driver.find_element_by_id(
-                    "add_new_question")
+                    "addQuestion")
+                add_new_question.click()
+                add_new_question.click()
                 add_new_question.click()
                 numoftries = numoftries + 1
                 if numoftries == 6:
                     # If we still haven't got there something else went wrong.
                     keeptrying = False
+                    print("gave up")
                     return False
 
     def multiple_choice_question(self):
@@ -179,7 +195,7 @@ class SurveyTest(BaseCase):
         rating1_label = driver.find_element_by_name("rating1_label")
         driver.execute_script(
             "return arguments[0].scrollIntoView();", rating1_label)
-        rating1_label("rating1_label").clear()
+        rating1_label.clear()
         rating1_label.send_keys("Rating 1")
 
         rating2_label = driver.find_element_by_name("rating2_label")
@@ -191,20 +207,20 @@ class SurveyTest(BaseCase):
         rating3_label = driver.find_element_by_name("rating3_label")
         driver.execute_script(
             "return arguments[0].scrollIntoView();", rating3_label)
-        rating2_label.clear()
-        rating2_label.send_keys("Rating 3")
+        rating3_label.clear()
+        rating3_label.send_keys("Rating 3")
 
         rating4_label = driver.find_element_by_name("rating4_label")
         driver.execute_script(
             "return arguments[0].scrollIntoView();", rating4_label)
-        rating2_label.clear()
-        rating2_label.send_keys("Rating 4")
+        rating4_label.clear()
+        rating4_label.send_keys("Rating 4")
 
         rating5_label = driver.find_element_by_name("rating5_label")
         driver.execute_script(
             "return arguments[0].scrollIntoView();", rating5_label)
-        rating2_label.clear()
-        rating2_label.send_keys("Rating 5")
+        rating5_label.clear()
+        rating5_label.send_keys("Rating 5")
 
         required_question = driver.find_element_by_xpath(
             "(//input[@id='required_question'])[4]")
@@ -227,6 +243,8 @@ class SurveyTest(BaseCase):
         answer_choices.clear()
         answer_choices.send_keys(
             "Option 1\nOption 2\nOption 3\nOption 4\nOption 5")
+        driver.execute_script(
+            "return arguments[0].scrollIntoView();", rating5_label)
         self.save_question()
 
     def single_text_question(self):
@@ -275,9 +293,14 @@ class SurveyTest(BaseCase):
         x_path = '//*[@id="1"]/div/input'
         wait.until(EC.presence_of_element_located((By.XPATH, x_path)))
         save_btn = driver.find_element_by_xpath(x_path)
-        scroll_script = "return arguments[0].scrollIntoView();"
-        driver.execute_script(scroll_script, save_btn)
-        save_btn.click()
+        save_btns = driver.find_elements_by_css_selector(
+            "input[class='default_btn saveQuestionButton saveSurQuestion']")
+        for save_btn in save_btns:
+            if save_btn.is_displayed():
+                scroll_script = "return arguments[0].scrollIntoView(true);"
+                driver.execute_script(scroll_script, save_btn)
+                save_btn.send_keys(Keys.NULL)
+                save_btn.click()
         expected = "Question has been saved"
         result = self.close_alert_and_get_its_text()
         self.assertEqual(expected, result)
@@ -316,8 +339,18 @@ class SurveyTest(BaseCase):
     def choose_users(self):
         """Selects all users in the first BeLL."""
         driver = self.driver
-        driver.find_element_by_xpath(
-            "//div[@id='main-body']/div/button[3]").click()
+        wait = WebDriverWait(driver, 10)
+        tries = 0
+        while tries < 5:
+            try:
+                driver.find_element_by_xpath(
+                    "//div[@id='main-body']/div/button[3]").click()
+                wait.until(EC.visibility_of_element_located(
+                    (By.NAME, "bellSelector")))
+                tries = tries + 1
+            except (TimeoutException, NoSuchElementException):
+                tries = tries + 1
+
         driver.find_element_by_name("bellSelector").click()
         driver.find_element_by_id("openMembersList").click()
         driver.find_element_by_name("surveyMember").click()
