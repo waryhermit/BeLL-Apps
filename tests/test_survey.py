@@ -26,27 +26,52 @@ class SurveyTest(BaseCase):
 
         driver = self.driver
         bell.login(driver, "admin", "password")
-        self.go_to_surveys()
-        self.add_survey()
-        self.add_survey_question()
-        self.multiple_choice_question()
-        self.add_survey_question()
-        self.rating_question()
-        self.add_survey_question()
-        self.single_text_question()
-        self.add_survey_question()
-        self.multiline_text_question()
-        self.choose_users()
+
+        did_nav = self.go_to_surveys()
+        self.assertEqual(did_nav, True)
+
+        suvey_added = self.add_survey()
+        self.assertEqual(suvey_added, True)
+        question_added = self.add_survey_question()
+        self.assertEqual(question_added, True)
+        question_filled = self.multiple_choice_question()
+        self.assertEqual(question_filled, True)
+
+        question_added = self.add_survey_question()
+        self.assertEqual(question_added, True)
+        question_filled = self.rating_question()
+        self.assertEqual(question_filled, True)
+
+        question_added = self.add_survey_question()
+        self.assertEqual(question_added, True)
+        question_filled = self.single_text_question()
+        self.assertEqual(question_filled, True)
+
+        question_added = self.add_survey_question()
+        self.assertEqual(question_added, True)
+        question_filled = self.multiline_text_question()
+        self.assertEqual(question_filled, True)
+
+        suvey_sent = self.choose_users()
+        self.assertEqual(suvey_sent, True)
 
     def test_delete_survey(self):
         """Tests the process of deleting a survey."""
         driver = self.driver
         bell.login(driver, "admin", "password")
-        self.go_to_surveys()
-        self.add_survey()
+        did_nav = self.go_to_surveys()
+        self.assertEqual(did_nav, True)
+
+        suvey_added = self.add_survey()
+        self.assertEqual(suvey_added, True)
+
         self.driver.back()
         self.driver.back()
         self.driver.refresh()
+        actual = driver.current_url
+        expected = \
+            'http://127.0.0.1:5981/apps/_design/bell/nation/index.html#survey'
+        self.assertEqual(actual, expected)
         self.assertTrue(self.delete_survey())
 
     def go_to_surveys(self):
@@ -83,6 +108,9 @@ class SurveyTest(BaseCase):
                     # If we still haven't got there something else went wrong.
                     keeptrying = False
                     return False
+        add_xpath = "//a[contains(@href, '#survey/add')]"
+        wait.until(EC.element_to_be_clickable((By.XPATH, add_xpath)))
+        return driver.find_element_by_xpath(add_xpath).is_displayed()
 
     def delete_survey(self):
         """Deletes a survey"""
@@ -124,46 +152,23 @@ class SurveyTest(BaseCase):
         long_wait = WebDriverWait(driver, 25)
         numoftries = 0
         # driver.find_element_by_id("addQuestion").click()
-        while numoftries < 3:
+        while numoftries < 5:
             try:
                 long_wait.until(
                     EC.element_to_be_clickable((By.ID, "addQuestion")))
                 add_question = driver.find_element_by_id("addQuestion")
                 add_question.click()
-                numoftries = numoftries + 1
-            except (TimeoutException, StaleElementReferenceException):
-                numoftries = numoftries + 1
-
-        # Clicking on the surveys link doesn't always work,
-        # so keep trying until we are at the meetups page.
-        # This might only be needed due to a bug in the site see:
-        # https://github.com/open-learning-exchange/BeLL-Apps/issues/585
-        keeptrying = True
-        numoftries = 0
-
-        while keeptrying:
-            try:
-                # If the old page is stale then we are on the meetups tab.
-                # short_wait.until(EC.staleness_of(add_question))
+                add_question.click()
+                add_question.click()
+                add_question.click()
                 short_wait.until(EC.visibility_of_element_located(
                     (By.ID, "dialog")))
-                keeptrying = False
-                print("got stale")
-
-            except TimeoutException:
-                long_wait.until(EC.element_to_be_clickable(
-                    (By.ID, "addQuestion")))
-                add_new_question = driver.find_element_by_id(
-                    "addQuestion")
-                add_new_question.click()
-                add_new_question.click()
-                add_new_question.click()
+                break
+            except (TimeoutException, StaleElementReferenceException):
                 numoftries = numoftries + 1
-                if numoftries == 6:
-                    # If we still haven't got there something else went wrong.
-                    keeptrying = False
-                    print("gave up")
-                    return False
+        if numoftries >= 5:
+            return False  # Failed to add question.
+        return driver.find_element_by_id("dialog").is_displayed()
 
     def multiple_choice_question(self):
         """"Fills out the information for a multiple choice question."""
@@ -175,7 +180,7 @@ class SurveyTest(BaseCase):
         driver.find_element_by_id("answer_choices").send_keys(
             "Choice 1\nChoice 2\nChoice 3")
         driver.find_element_by_id("required_question").click()
-        self.save_question()
+        return self.save_question()
 
     def rating_question(self):
         """"Fills out the information for a rating question."""
@@ -233,8 +238,10 @@ class SurveyTest(BaseCase):
         driver.execute_script(
             "return arguments[0].scrollIntoView();", save_btn)
         save_btn.click()
-        self.assertEqual("Please provide atleast one options",
-                         self.close_alert_and_get_its_text())
+        if not self.close_alert_and_get_its_text() == \
+                "Please provide atleast one options":
+            return False
+
         answer_choices = driver.find_element_by_xpath(
             "(//textarea[@id='answer_choices'])[2]")
         driver.execute_script(
@@ -245,7 +252,7 @@ class SurveyTest(BaseCase):
             "Option 1\nOption 2\nOption 3\nOption 4\nOption 5")
         driver.execute_script(
             "return arguments[0].scrollIntoView();", rating5_label)
-        self.save_question()
+        return self.save_question()
 
     def single_text_question(self):
         """"Fills out the information for a single line text question."""
@@ -260,7 +267,7 @@ class SurveyTest(BaseCase):
         req_xpath = "(//input[@id='required_question'])[2]"
         is_required = driver.find_element_by_xpath(req_xpath)
         is_required.click()
-        self.save_question()
+        return self.save_question()
 
     def multiline_text_question(self):
         """"Fills out the information for a paragraph text question."""
@@ -272,19 +279,19 @@ class SurveyTest(BaseCase):
         q_txt = driver.find_element_by_xpath(q_txt_xpath)
         q_txt.clear()
         q_txt.send_keys("This is an optional question.")
-        self.save_question()
+        return self.save_question()
 
-    def rearrange_questions(self):
-        """Moves the questions around. Not finished."""
-        driver = self.driver
-        driver.find_element_by_id("Rearrange").click()
-        driver.find_element_by_id("movedown").click()
-        driver.find_element_by_name("questionRow").click()
-        driver.find_element_by_id("movedown").click()
-        driver.find_element_by_xpath(
-            "(//input[@name='questionRow'])[3]").click()
-        driver.find_element_by_id("moveup").click()
-        driver.find_element_by_id("Rearrange").click()
+    # def rearrange_questions(self):
+    #     """Moves the questions around. Not finished."""
+    #     driver = self.driver
+    #     driver.find_element_by_id("Rearrange").click()
+    #     driver.find_element_by_id("movedown").click()
+    #     driver.find_element_by_name("questionRow").click()
+    #     driver.find_element_by_id("movedown").click()
+    #     driver.find_element_by_xpath(
+    #         "(//input[@name='questionRow'])[3]").click()
+    #     driver.find_element_by_id("moveup").click()
+    #     driver.find_element_by_id("Rearrange").click()
 
     def save_question(self):
         """Saves the currently open question."""
@@ -303,63 +310,75 @@ class SurveyTest(BaseCase):
                 save_btn.click()
         expected = "Question has been saved"
         result = self.close_alert_and_get_its_text()
-        self.assertEqual(expected, result)
+        return expected == result
 
-    def choose_users_by_criteria(self):
-        """Not Finished."""
-        driver = self.driver
-        driver.find_element_by_css_selector("button.btn.btn-info").click()
-        driver.find_element_by_name("genderSelector").click()
-        driver.find_element_by_xpath(
-            "(//input[@name='genderSelector'])[2]").click()
-        driver.find_element_by_name("ageGroupSelector").click()
-        driver.find_element_by_xpath(
-            "(//input[@name='ageGroupSelector'])[2]").click()
-        driver.find_element_by_xpath(
-            "(//input[@name='ageGroupSelector'])[3]").click()
-        driver.find_element_by_xpath(
-            "(//input[@name='ageGroupSelector'])[4]").click()
-        driver.find_element_by_xpath(
-            "(//input[@name='ageGroupSelector'])[5]").click()
-        driver.find_element_by_name("rolesSelector").click()
-        driver.find_element_by_xpath(
-            "(//input[@name='rolesSelector'])[2]").click()
-        driver.find_element_by_xpath(
-            "(//input[@name='rolesSelector'])[3]").click()
-        driver.find_element_by_name("bellSelector").click()
-        driver.find_element_by_name("includeAdmins").click()
-        driver.find_element_by_id("UnSelectAllCriteria").click()
-        driver.find_element_by_id("selectAllCriteria").click()
+    # def choose_users_by_criteria(self):
+    #     """Not Finished."""
+    #     driver = self.driver
+    #     driver.find_element_by_css_selector("button.btn.btn-info").click()
+    #     driver.find_element_by_name("genderSelector").click()
+    #     driver.find_element_by_xpath(
+    #         "(//input[@name='genderSelector'])[2]").click()
+    #     driver.find_element_by_name("ageGroupSelector").click()
+    #     driver.find_element_by_xpath(
+    #         "(//input[@name='ageGroupSelector'])[2]").click()
+    #     driver.find_element_by_xpath(
+    #         "(//input[@name='ageGroupSelector'])[3]").click()
+    #     driver.find_element_by_xpath(
+    #         "(//input[@name='ageGroupSelector'])[4]").click()
+    #     driver.find_element_by_xpath(
+    #         "(//input[@name='ageGroupSelector'])[5]").click()
+    #     driver.find_element_by_name("rolesSelector").click()
+    #     driver.find_element_by_xpath(
+    #         "(//input[@name='rolesSelector'])[2]").click()
+    #     driver.find_element_by_xpath(
+    #         "(//input[@name='rolesSelector'])[3]").click()
+    #     driver.find_element_by_name("bellSelector").click()
+    #     driver.find_element_by_name("includeAdmins").click()
+    #     driver.find_element_by_id("UnSelectAllCriteria").click()
+    #     driver.find_element_by_id("selectAllCriteria").click()
 
-        driver.find_element_by_id("formButton").click()
-        self.assertEqual("No members have been found for the selected options",
-                         self.close_alert_and_get_its_text())
-        driver.find_element_by_id("returnBack").click()
+    #     driver.find_element_by_id("formButton").click()
+    #     self.assertEqual(
+    #       "No members have been found for the selected options",
+    #                      self.close_alert_and_get_its_text())
+    #     driver.find_element_by_id("returnBack").click()
 
     def choose_users(self):
         """Selects all users in the first BeLL."""
         driver = self.driver
-        wait = WebDriverWait(driver, 10)
+        wait = WebDriverWait(driver, 15)
         tries = 0
         while tries < 5:
             try:
-                driver.find_element_by_xpath(
-                    "//div[@id='main-body']/div/button[3]").click()
+                x_path = '//button[contains(@onclick,"communitiesList")]'
+                wait.until(EC.element_to_be_clickable(
+                    (By.XPATH, x_path)))
+                driver.find_element_by_xpath(x_path).click()
                 wait.until(EC.visibility_of_element_located(
                     (By.NAME, "bellSelector")))
                 tries = tries + 1
-            except (TimeoutException, NoSuchElementException):
+            except (TimeoutException, NoSuchElementException,
+                    StaleElementReferenceException):
                 tries = tries + 1
-
+        wait.until(EC.element_to_be_clickable((By.NAME, "bellSelector")))
         driver.find_element_by_name("bellSelector").click()
+        wait.until(EC.element_to_be_clickable((By.ID, "openMembersList")))
         driver.find_element_by_id("openMembersList").click()
+        wait.until(EC.element_to_be_clickable((By.NAME, "surveyMember")))
         driver.find_element_by_name("surveyMember").click()
+        wait.until(EC.element_to_be_clickable((By.NAME, "includeAdmins")))
         driver.find_element_by_name("includeAdmins").click()
+        wait.until(EC.element_to_be_clickable((By.ID, "UnSelectAllMembers")))
         driver.find_element_by_id("UnSelectAllMembers").click()
+        wait.until(EC.element_to_be_clickable((By.ID, "selectAllMembers")))
         driver.find_element_by_id("selectAllMembers").click()
+        wait.until(EC.element_to_be_clickable(
+            (By.ID, "sendSurveyToSelectedList")))
         driver.find_element_by_id("sendSurveyToSelectedList").click()
-        self.assertEqual("Survey has been sent successfully",
-                         self.close_alert_and_get_its_text())
+        expected = "Survey has been sent successfully"
+        result = self.close_alert_and_get_its_text()
+        return expected == result
 
     def close_alert_and_get_its_text(self):
         """"Closes the currently open alert and returns its text."""
