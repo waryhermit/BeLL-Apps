@@ -382,7 +382,6 @@ class SurveyTest(BaseCase):
             print("No members to send the survey to!")
             return False  # No members added - failed.
 
-        driver.find_element_by_name("surveyMember").click()
         wait.until(EC.element_to_be_clickable((By.NAME, "includeAdmins")))
         driver.find_element_by_name("includeAdmins").click()
         wait.until(EC.element_to_be_clickable((By.ID, "UnSelectAllMembers")))
