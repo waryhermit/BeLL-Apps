@@ -365,7 +365,23 @@ class SurveyTest(BaseCase):
         driver.find_element_by_name("bellSelector").click()
         wait.until(EC.element_to_be_clickable((By.ID, "openMembersList")))
         driver.find_element_by_id("openMembersList").click()
-        wait.until(EC.element_to_be_clickable((By.NAME, "surveyMember")))
+        no_members = True
+        try:
+            wait.until(EC.element_to_be_clickable((By.NAME, "surveyMember")))
+            members = driver.find_elements_by_css_selector(
+                'input[name="surveyMember"]')
+            if len(members) > 0:
+                no_members = False
+                for member in members:
+                    member.click()
+            else:
+                no_members = True
+        except TimeoutException:
+            no_members = True
+        if no_members:
+            print("No members to send the survey to!")
+            return False  # No members added - failed.
+
         driver.find_element_by_name("surveyMember").click()
         wait.until(EC.element_to_be_clickable((By.NAME, "includeAdmins")))
         driver.find_element_by_name("includeAdmins").click()
