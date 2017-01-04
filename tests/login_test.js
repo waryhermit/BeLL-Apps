@@ -9,6 +9,8 @@ Scenario('test successful login', (I) => {
     I.fillField('Login', 'admin');
     I.fillField('Password', 'password');
     I.click('Sign In');
-    I.waitForText('Manager', 10);
-    I.seeInCurrentUrl('#dashboard');
+    // I.waitForText('Manager', 10);
+    // I.seeInCurrentUrl('#dashboard');
+    I.waitForText('Set Configurations', 10);
+    I.seeInCurrentUrl('#configuration/add');
 });
