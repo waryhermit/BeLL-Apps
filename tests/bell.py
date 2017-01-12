@@ -106,36 +106,41 @@ def create_member(**kwargs):
     mname = kwargs['mname'] if "mname" in kwargs else "q"
     lname = kwargs['lname'] if "lname" in kwargs else "q"
     community = kwargs['community'] if "community" in kwargs else "NATION"
-    doc = db.save(
-        {
-            "kind": "Member",
-            "roles": ["Learner"],
-            "bellLanguage": "English",
-            "firstName": fname,
-            "lastName": lname,
-            "middleNames": mname,
+
+    doc = db.save({
+        "kind": "Member",
+        "roles": [
+            "Learner"
+        ],
+        "bellLanguage": "English",
+        "community": "NATION",
+        "lastName": lname,
+        "status": "active",
+        "Gender": "Male",
+        "lastEditDate": "2017-01-09T20:48:41.178Z",
+        "phone": "q",
+        "credentials": {
+            "value": "5605c1a22a715e2cb1966a1f4e244e87588c385c",
             "login": "q",
-            "password": "",
-            "phone": "q",
-            "email": "q",
-            "language": "q",
-            "BirthDate": "1918-12-31T22:00:00.000Z",
-            "visits": 0,
-            "Gender": "Male",
-            "levels": "1",
-            "status": "active",
-            "community": community,
-            "region": "",
-            "nation": "earthbell",
-            "lastLoginDate": "2016-12-15T22:00:00.000Z",
-            "lastEditDate": "2016-12-16T14:48:32.771Z",
-            "credentials": {
-                "salt": "7694f4a66316e53c8cdd9d9954bd611d",
-                "value": "5605c1a22a715e2cb1966a1f4e244e87588c385c",
-                "login": "q"
-            }
-        }
-    )
+            "salt": "7694f4a66316e53c8cdd9d9954bd611d"
+        },
+        "nation": "earthbell",
+        "levels": "1",
+        "visits": "2",
+        "lastLoginDate": "2017-01-09T05:00:00.000Z",
+        "language": "q",
+        "password": "",
+        "firstName": fname,
+        "email": "q",
+        "middleNames": mname,
+        "BirthDate": "1918-12-31T05:00:00.000Z",
+        "login": "q",
+        "region": "",
+        "yearsOfTeaching": None,
+        "teachingCredentials": None,
+        "subjectSpecialization": None,
+        "forGrades": None
+    })
 
 
 def delete_member():
