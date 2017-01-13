@@ -25,7 +25,7 @@ def login(driver, username, password):
     # login
     login_test(driver, username, password)
     # if we land on the configuration page, fill out the configuration form
-    config_url = get_url + "#configuration/add"
+    config_url = get_url() + "#configuration/add"
     if driver.current_url == config_url:
         configuration(driver)
     sleep(5)
