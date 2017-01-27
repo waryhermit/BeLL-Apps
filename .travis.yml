@@ -47,6 +47,7 @@ before_install:
   - curl -X PUT 'http://127.0.0.1:5981/_config/admins/nation' -d '"oleoleole"'
   - npm install -g codeceptjs
   - npm install -g webdriverio
+  - npm install -g co
 
 script:
   - export
