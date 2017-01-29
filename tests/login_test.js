@@ -5,7 +5,6 @@ var loginCookies = [];
 
 Before((I) => {
     I.login('admin', 'password');
-
 });
 
 Scenario('test successful login', (I) => {

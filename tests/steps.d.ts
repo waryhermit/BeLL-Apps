@@ -51,7 +51,7 @@ declare namespace CodeceptJS {
     saveScreenshot: (fileName) => any; 
     setCookie: (cookie) => any; 
     clearCookie: (cookie) => any; 
-    clearField: (locator) => any; 
+    clearField: (field) => any; 
     seeCookie: (name) => any; 
     dontSeeCookie: (name) => any; 
     grabCookie: (name) => any; 
