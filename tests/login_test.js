@@ -9,7 +9,7 @@ Before((I) => {
 
 Scenario('test successful login', (I) => {
     I.seeInCurrentUrl('#dashboard');
-    I.wait(60);
+    I.wait(30);
     I.click('Logout');
     I.login('admin', 'password');
 });
