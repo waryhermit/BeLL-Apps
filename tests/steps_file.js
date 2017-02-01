@@ -24,7 +24,7 @@ module.exports = function () {
           this.fillField(fields[fn], 'ole');
         }
         this.scrollTo('#formButton');
-        this.click("Submit Configurations");
+        this.click('#formButton');
         this.wait(5);
         this.seeInPopup("Configurations are successfully added.")
         this.acceptPopup();
