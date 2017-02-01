@@ -24,7 +24,7 @@ module.exports = function () {
           this.fillField(fields[fn], 'ole');
         }
         this.click("Submit Configurations");
-        this.seeInPopup("Configurations are successfully added.")
+        this.waitForText("Configurations are successfully added.")
         this.acceptPopup();
         this.seeInCurrentUrl('#dashboard');
       }
