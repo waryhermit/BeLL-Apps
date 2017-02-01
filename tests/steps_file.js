@@ -17,6 +17,12 @@ module.exports = function () {
         this.fillField('Password', 'password');
         this.click('Sign In');
         this.saveCookies();
+        this.waitForText('Set Configurations', 10);
+        this.seeInCurrentUrl('#configuration/add');
+        var fields = ["name", "code", "region", "nationName", "nationUrl", "notes"];
+        for (let fn in fields) {
+          this.fillField(fields[fn], 'ole');
+        }
       }
       else {
         this.loadCookies();
