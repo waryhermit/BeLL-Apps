@@ -23,6 +23,8 @@ module.exports = function () {
         for (let fn in fields) {
           this.fillField(fields[fn], 'ole');
         }
+        this.click("Submit Configurations");
+        this.seeInCurrentUrl('#dashboard');
       }
       else {
         this.loadCookies();
