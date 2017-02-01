@@ -17,7 +17,6 @@ module.exports = function () {
         this.fillField('Password', 'password');
         this.click('Sign In');
         this.saveCookies();
-        pause();
         this.waitForText('Set Configurations', 10);
         this.seeInCurrentUrl('#configuration/add');
         var fields = ['//*[@name="name"]', "code", "region", "nationName", "nationUrl", "notes"];
