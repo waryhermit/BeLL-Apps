@@ -9,7 +9,6 @@ Before((I) => {
 
 Scenario('test successful login', (I) => {
     I.seeInCurrentUrl('#dashboard');
-
 });
 
 Scenario('test second successful login', (I) => {

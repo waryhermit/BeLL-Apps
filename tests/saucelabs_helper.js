@@ -35,6 +35,7 @@ class SauceLabsSession extends Helper {
     return getloginCookies(this);
   }
 
+
   _after() {
     if (process.env.SAUCE_USERNAME) {
       var sessionId = this.helpers['WebDriverIO'].browser.requestHandler.sessionID;
@@ -58,7 +59,7 @@ class SauceLabsSession extends Helper {
           'pass': process.env.SAUCE_ACCESS_KEY
         }
       };
-      
+
       function callback(error, response, body) {
         if (!error && response.statusCode == 200) {
           console.log(body);
