@@ -13,5 +13,5 @@ Scenario('test successful login', (I) => {
 });
 
 Scenario('test second successful login', (I) => {
-    I.login('admin', 'password');
+    I.seeInCurrentUrl('#dashboard');
 });

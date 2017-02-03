@@ -11,6 +11,7 @@ module.exports = function () {
     // It is recommended to place a general 'login' fSunction here.
 
     login: function (email, password) {
+
       if (loginCount < 1) {
         this.amOnPage('/');
         this.fillField('Login', 'admin');
@@ -32,8 +33,10 @@ module.exports = function () {
         this.seeInCurrentUrl('#dashboard');
       }
       else {
-        this.loadCookies();
+
         this.amOnPage('/');
+        this.loadCookies();
+        this.amOnPage('http://127.0.0.1:5981/apps/_design/bell/MyApp/index.html');
         this.seeInCurrentUrl('#dashboard');
       }
       loginCount = loginCount + 1;
