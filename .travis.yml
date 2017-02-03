@@ -25,6 +25,7 @@ addons:
 install:
   - npm install -g codeceptjs
   - npm install -g webdriverio
+  - npm install -g cookie
   - pip install selenium
   - pip install sauceclient
 
