@@ -1,9 +1,40 @@
 
 'use strict';
 let Helper = codecept_helper;
+let I;
+var co = require('co');
 var request = require('request');
-
+var loginCount = 1; // Used to check for config page.
 class SauceLabsSession extends Helper {
+
+  getcookies() {
+    // access current client of WebDriverIO helper
+    let browser = this.helpers['WebDriverIO'].browser;
+    // get all cookies according to http://webdriver.io/api/protocol/cookie.html
+    // any helper method should return a value in order to be added to promise chain
+    return browser.cookie();
+  }
+
+  saveCookies() {
+    var getloginCookies = co.wrap(function* (client) {
+      let tmp = yield client.getcookies();
+      client.loginCookies = tmp.value;
+    })
+    return getloginCookies(this);
+  }
+
+  loadCookies() {
+    var getloginCookies = co.wrap(function* (client) {
+      let browser = client.helpers['WebDriverIO'].browser;
+      //console.log(browser);
+      for (let k in client.loginCookies) {
+        console.log(client.loginCookies[k]);
+        yield browser.setCookie({ name: client.loginCookies[k].name, value: client.loginCookies[k].value });
+      }
+    })
+    return getloginCookies(this);
+  }
+
 
   _after() {
     if (process.env.SAUCE_USERNAME) {

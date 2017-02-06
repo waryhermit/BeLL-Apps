@@ -3,6 +3,7 @@ if (process.env.SAUCE_USERNAME) {
     "tests": "./*_test.js",
     "timeout": 10000,
     "output": "./output",
+    "bootstrap": "./codeceptjs-init.js",
     "helpers": {
       "SauceLabsSession": {
         "require": "./saucelabs_helper.js"
@@ -16,6 +17,7 @@ if (process.env.SAUCE_USERNAME) {
         "host": "ondemand.saucelabs.com",
         "port": "80",
         "sauceConnect": true,
+        "restart": false,
         "desiredCapabilities": {
           "browserName": "firefox",
           "version": "50",
@@ -29,7 +31,6 @@ if (process.env.SAUCE_USERNAME) {
     "include": {
       "I": "./steps_file.js"
     },
-    "bootstrap": false,
     "mocha": {},
     "name": "tests"
   };
@@ -38,8 +39,9 @@ if (process.env.SAUCE_USERNAME) {
     "tests": "./*_test.js",
     "timeout": 10000,
     "output": "./output",
+    "bootstrap": "./codeceptjs-init.js",
     "helpers": {
-       "SauceLabsSession": {
+      "SauceLabsSession": {
         "require": "./saucelabs_helper.js"
       },
       "WebDriverIO": {
@@ -51,7 +53,6 @@ if (process.env.SAUCE_USERNAME) {
     "include": {
       "I": "./steps_file.js"
     },
-    "bootstrap": false,
     "mocha": {},
     "name": "tests"
   }

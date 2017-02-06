@@ -1,17 +1,16 @@
 /// <reference path="./steps.d.ts" />
 Feature('Login');
+var FirstLogin = false;
+var loginCookies = [];
+
+Before((I) => {
+    I.login('admin', 'password');
+});
 
 Scenario('test successful login', (I) => {
-    // I.fillField('q','ole.org');
-    // I.click('btnG');
-    // I.seeInTitle('ole.org');
-    I.amOnPage('/');
-    I.fillField('Login', 'admin');
-    I.fillField('Password', 'password');
-    I.click('Sign In');
-    //I.waitForText('Manager', 10);
-    //I.wait(30);
-    //I.seeInCurrentUrl('#dashboard');
-    I.waitForText('Set Configurations', 10);
-    I.seeInCurrentUrl('#configuration/add');
+    I.seeInCurrentUrl('#dashboard');
+});
+
+Scenario('test second successful login', (I) => {
+    I.seeInCurrentUrl('#dashboard');
 });
