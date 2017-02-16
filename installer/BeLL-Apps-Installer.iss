@@ -76,7 +76,7 @@ var
   Result1 : Boolean;
 begin
     Result := false;
-    if RegKeyExists(HKEY_CURRENT_USER, 'Software\Mozilla\Mozilla Firefox') then
+    if RegKeyExists(HKEY_CURRENT_USER, 'Software\Mozilla\Mozilla Firefox') OR RegKeyExists(HKEY_CURRENT_USER, 'Software\Mozilla\Firefox') then
     begin
       Result := true;
     end;
