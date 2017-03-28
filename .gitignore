@@ -1,2 +1,6 @@
 .DS_Store
 .idea
+/node_modules
+/node_modules/co
+/node_modules/cookie
+/.vs
