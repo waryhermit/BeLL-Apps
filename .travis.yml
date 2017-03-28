@@ -37,6 +37,7 @@ install:
   - pip install sauceclient
   - pip install pycouchdb
   - yarn global add codeceptjs
+  - yarn global add webdriverio
 
 before_install:
   - yarn install
