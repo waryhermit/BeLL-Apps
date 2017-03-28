@@ -38,6 +38,7 @@ install:
   - pip install pycouchdb
 
 before_install:
+  - yarn install
   - docker pull klaemo/couchdb:1.6.1
   - docker run -d -p 5981:5984 --name bell klaemo/couchdb:1.6.1
   - echo "node_modules/.bin/couchapp push \$1 \$2" > pushDocToDb.sh
