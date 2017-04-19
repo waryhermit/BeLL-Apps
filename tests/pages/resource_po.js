@@ -145,6 +145,8 @@ module.exports = {
     fill_resource(resource_form) {
         // TODO: if they don't specify Subject, Level, or collections select all.
         // TODO: if there is a file incuded upload it.
+        I.waitForVisible((this.feilds.title);
+        I.wait(1);
         I.fillField(this.feilds.title, resource_form.title);
         I.fillField(this.feilds.author, resource_form.author);
         I.fillField(this.feilds.year, resource_form.year);
