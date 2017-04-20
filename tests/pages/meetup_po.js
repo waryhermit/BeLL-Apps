@@ -33,6 +33,7 @@ module.exports = {
 
     go_to_meetups() {
         I.waitForVisible(this.meetupLink);
+        I.wait(1);
         I.click(this.meetupLink);
         I.waitForVisible(this.addMeetupButton);
         I.see("Topic");
