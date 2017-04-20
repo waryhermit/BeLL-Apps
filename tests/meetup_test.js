@@ -1,5 +1,5 @@
 /// <reference path="./steps.d.ts" />
-Feature('Meetup', { retries: 3 });
+Feature('Meetup');
 
 var today = new Date();
 var dd = today.getDate();

@@ -86,16 +86,16 @@ module.exports = {
         I.waitForVisible(this.inviteButton);
         I.click(this.inviteButton);
         I.waitForVisible(this.inviteWindow);
-        I.selectOption(this.inviteType, type)
+        I.waitForVisible(this.inviteType);
         // The defualt option is all, so we only have to change it
         // if they have a list of memebers they want to add.
         if (type === "Members")
         {
+            I.selectOption(this.inviteType, type)
             names.forEach(function (item) {
                 I.click('//*[@id="invitationForm"]//li//li[contains(.,"' + item + '")]/input');
             });
         }
-
         I.click(this.inviteSendButton);
         I.wait(1);
         I.seeInPopup("Invitation sent successfully.");

@@ -132,6 +132,7 @@ module.exports = {
         I.seeInCurrentUrl('#resource/add');
         I.waitForVisible(this.saveResourceBtn);
         I.click(this.saveResourceBtn);
+        I.wait(1);
         if (expect_failure) {
             I.seeInPopup("Title already exists.");
             I.acceptPopup();
