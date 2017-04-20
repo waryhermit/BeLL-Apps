@@ -83,8 +83,8 @@ module.exports = {
 
     return_home()
     {
-        I.waitForVisible('//*[@id="itemsinnavbar"]/li/a[contains(.,"My Home")]');
-        I.click('//*[@id="itemsinnavbar"]/li/a[contains(.,"My Home")]');
+        I.waitForVisible('//*[@id="itemsinnavbar"]/li/a');
+        I.click('//*[@id="itemsinnavbar"]/li/a');
         I.waitForVisible(this.managerLink);
         I.wait(2);
     }
