@@ -107,6 +107,7 @@ module.exports = {
     cancel_meetup()
     {
         I.waitForVisible(this.meetupFormCancel);
+        I.wait(1);
         I.click(this.meetupFormCancel);
         I.waitForVisible(this.addMeetupButton);
         I.see("Topic");
