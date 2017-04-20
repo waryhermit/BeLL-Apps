@@ -116,7 +116,7 @@ module.exports = {
         I.click(this.inviteButton);
         I.waitForVisible(this.cancelInvite);
         I.click(this.cancelInvite);
+        I.waitForStalenessOf(this.cancelInvite);
         I.waitForVisible(this.addMeetupButton);
-        I.see("Topic");
     }
 }
