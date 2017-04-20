@@ -50,6 +50,7 @@ module.exports = {
         I.see("Topic");
         I.waitForVisible(deleteBTN);
         I.scrollTo(deleteBTN);
+        I.wait(1);
         I.click(deleteBTN);
         I.wait(1);
         I.seeInPopup("Are you sure that you want to delete this meetup?");
